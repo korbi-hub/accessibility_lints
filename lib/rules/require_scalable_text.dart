@@ -1,4 +1,3 @@
-
 import 'package:accessibility_lints/fixes/require_scalable_text_fix.dart';
 import 'package:accessibility_lints/shared/constants.dart';
 import 'package:accessibility_lints/shared/utility_methods.dart';
@@ -28,7 +27,7 @@ class RequireScalableText extends DartLintRule {
 
       // check if the widget requires the desired property
       if (widgetName != null && widgetName == 'Text') {
-        if (!UtilityMethods.hasParameter(
+        if (!hasParameter(
           parameter: 'textScaleFactor',
           arguments: node.argumentList.arguments,
         )) {

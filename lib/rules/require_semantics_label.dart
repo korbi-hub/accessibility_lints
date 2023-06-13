@@ -1,5 +1,4 @@
 import 'package:accessibility_lints/fixes/require_semantics_label_fix.dart';
-import 'package:accessibility_lints/fixes/require_semantics_widget_fix.dart';
 import 'package:accessibility_lints/shared/constants.dart';
 import 'package:accessibility_lints/shared/utility_methods.dart';
 import 'package:analyzer/error/listener.dart';
@@ -22,19 +21,11 @@ class RequireSemanticsLabel extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      // extract the widget name
-      final String? widgetName =
-          node.constructorName.staticElement?.displayName;
-
       // check if the widget requires the desired property
-      if (widgetName != null &&
-          requireSemanticsLabel.contains(widgetName) &&
-          !UtilityMethods.hasParameter(
-            parameter: 'semanticsLabel',
-            arguments: node.argumentList.arguments,
-          ) &&
-          UtilityMethods.parentIsNotSemantic(node)) {
-        // display the respective error message
+      if (!containsSemanticLabel(node) &&
+          requiresSemanticsLabel(
+              node.constructorName.staticElement!.displayName) &&
+          !parentIsSemantic(node.parent, node)) {
         reporter.reportErrorForNode(_code, node);
       }
     });
@@ -43,6 +34,5 @@ class RequireSemanticsLabel extends DartLintRule {
   @override
   List<Fix> getFixes() => [
         RequireSemanticsLabelFix(),
-        RequireSemanticsWidgetFix(),
       ];
 }

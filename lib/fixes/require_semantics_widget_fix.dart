@@ -21,24 +21,21 @@ class RequireSemanticsWidgetFix extends DartFix {
     context.registry.addInstanceCreationExpression((node) {
       if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
 
-      // extract the widget name
-      final String? widgetName =
-          node.constructorName.staticElement?.displayName;
-
-      // check if the widget requires the desired property
-      if (widgetName != null &&
-          widgetName == 'Text' //&&
-          // UtilityMethods.parentIsNotSemantic(node)
-      ) {
-        // insert the missing parameter into the widget's arguments
-        final String semanticsWidget =
-            UtilityMethods.wrapInSemanticsWidget(widget: node);
-        UtilityMethods.insertSemanticsWidget(
-          correctionMessage: semanticsWidgetCorrection,
-          semanticsWidget: semanticsWidget,
-          selectedNode: node,
-          changeReporter: reporter,
-        );
+      if (node.constructorName.staticElement?.displayName != null) {
+        if (!containsSemanticLabel(node) &&
+            (requiresSemanticLabel(
+                node.constructorName.staticElement!.displayName) ||
+            requiresSemanticsLabel(
+                node.constructorName.staticElement!.displayName)) &&
+            !parentIsSemantic(node.parent, node)) {
+          final String semanticsWidget = wrapInSemanticsWidget(widget: node);
+          insertSemanticsWidget(
+            correctionMessage: semanticsWidgetCorrection,
+            semanticsWidget: semanticsWidget,
+            selectedNode: node,
+            changeReporter: reporter,
+          );
+        }
       }
     });
   }

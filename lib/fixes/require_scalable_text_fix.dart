@@ -26,18 +26,18 @@ class RequireScalableTextFix extends DartFix {
       // check if the widget requires the desired property
       if (widgetName != null &&
           widgetName == 'Text' &&
-          !UtilityMethods.hasParameter(
+          !hasParameter(
             parameter: 'textScaleFactor',
             arguments: node.argumentList.arguments,
           )) {
         // insert the missing parameter into the widget's arguments
-        final String replacement = UtilityMethods.addRemainingParameter(
+        final String replacement = addRemainingParameter(
           newParameter: scalableTextFix,
           arguments: node.argumentList.arguments,
         );
 
         // apply the correction
-        UtilityMethods.applyParameter(
+        applyParameter(
           correctionMessage: scalableTextCorrection,
           parameter: replacement,
           selectedNode: node,
