@@ -1,4 +1,3 @@
-import 'package:accessibility_lints/fixes/require_semantic_label_fix.dart';
 import 'package:accessibility_lints/shared/constants.dart';
 import 'package:accessibility_lints/shared/utility_methods.dart';
 import 'package:analyzer/error/error.dart';
