@@ -20,7 +20,7 @@ class RequireSemanticsWidget extends DartLintRule {
       if (node.constructorName.staticElement?.displayName != null) {
         if (!containsSemanticLabel(node) &&
             (requiresSemanticLabel(
-                node.constructorName.staticElement!.displayName) ||
+                    node.constructorName.staticElement!.displayName) ||
                 requiresSemanticsLabel(
                     node.constructorName.staticElement!.displayName)) &&
             !parentIsSemantic(node.parent, node)) {

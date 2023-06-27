@@ -157,14 +157,11 @@ bool parentIsSemantic(AstNode? parentNode, InstanceCreationExpression node) {
   // structures like e.g. Columns need to be parsed differently
   else {
     parentContent = parentContent.split(node.toString())[0];
-
-    print(parentNode.parent?.parent);
     if (parentContent.contains('[')) {
       return false;
     } else {
       parentContent =
           parentContent.split(node.constructorName.staticElement!.name).last;
-
       return parentContent.contains(RegExp(r'SemanticsProperties'));
     }
   }
