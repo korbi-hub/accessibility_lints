@@ -1,6 +1,6 @@
-import 'package:accessibility_lints/fixes/require_scalable_text_fix.dart';
 import 'package:accessibility_lints/shared/constants.dart';
 import 'package:accessibility_lints/shared/utility_methods.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -41,3 +41,49 @@ class RequireScalableText extends DartLintRule {
   @override
   List<Fix> getFixes() => [RequireScalableTextFix()];
 }
+
+
+///
+/// append textScaleFactor to the widget
+///
+class RequireScalableTextFix extends DartFix {
+  @override
+  void run(
+      CustomLintResolver resolver,
+      ChangeReporter reporter,
+      CustomLintContext context,
+      AnalysisError analysisError,
+      List<AnalysisError> others,
+      ) {
+    context.registry.addInstanceCreationExpression((node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      // extract the widget name
+      final String? widgetName =
+          node.constructorName.staticElement?.displayName;
+
+      // check if the widget requires the desired property
+      if (widgetName != null &&
+          widgetName == 'Text' &&
+          !hasParameter(
+            parameter: 'textScaleFactor',
+            arguments: node.argumentList.arguments,
+          )) {
+        // insert the missing parameter into the widget's arguments
+        final String replacement = addRemainingParameter(
+          newParameter: scalableTextFix,
+          arguments: node.argumentList.arguments,
+        );
+
+        // apply the correction
+        applyParameter(
+          correctionMessage: scalableTextCorrection,
+          parameter: replacement,
+          selectedNode: node,
+          changeReporter: reporter,
+        );
+      }
+    });
+  }
+}
+
