@@ -11,7 +11,7 @@ class RequireSemanticLabel extends DartLintRule {
   static const _code = LintCode(
     name: semanticLabelName,
     problemMessage: semanticsLabelMsg,
-    correctionMessage: semanticsLableCorrection,
+    correctionMessage: semanticsLabelCorrection,
   );
 
   @override
@@ -53,7 +53,7 @@ class RequireSemanticLabelFix extends DartFix {
               node.constructorName.staticElement!.displayName) &&
           !parentIsSemantic(node.parent, node)) {
         applyParameter(
-          correctionMessage: semanticsLableCorrection,
+          correctionMessage: semanticsLabelCorrection,
           parameter: addRemainingParameter(
               newParameter: semanticLabelFix,
               arguments: node.argumentList.arguments),
