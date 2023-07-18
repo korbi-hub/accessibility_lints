@@ -36,12 +36,12 @@ void applyParameter(
     required String parameter,
     required InstanceCreationExpression selectedNode,
     required ChangeReporter changeReporter}) {
-// instantiate a ChangeBuilder
+  // instantiate a ChangeBuilder
   final changeBuilder = changeReporter.createChangeBuilder(
     message: correctionMessage,
     priority: 1,
   );
-// apply the fix to the incorrect line
+  // apply the fix to the incorrect line
   changeBuilder.addDartFileEdit((builder) {
     builder.addSimpleReplacement(
         SourceRange(
@@ -65,8 +65,10 @@ void insertSemanticsWidget(
     required String semanticsWidget,
     required InstanceCreationExpression selectedNode,
     required ChangeReporter changeReporter}) {
-  final changeBuilder = changeReporter.createChangeBuilder(
-      message: correctionMessage, priority: 1);
+  final ChangeBuilder changeBuilder = changeReporter.createChangeBuilder(
+    message: correctionMessage,
+    priority: 1,
+  );
 
   changeBuilder.addDartFileEdit((builder) {
     builder.addSimpleReplacement(selectedNode.sourceRange, semanticsWidget);
@@ -108,7 +110,7 @@ bool _hasSemanticParent(AstNode? ast) {
 ///
 bool containsSemanticLabel(InstanceCreationExpression node) {
   if (hasParameter(
-      parameter: semanticsLabelFlag, arguments: node.argumentList.arguments)) {
+      parameter: semanticLabelFlag, arguments: node.argumentList.arguments)) {
     return true;
   } else if (hasParameter(
       parameter: semanticsLabelFlag, arguments: node.argumentList.arguments)) {
@@ -138,6 +140,19 @@ bool requiresSemanticsLabel(String? constructorName) {
     return false; // to avoid unnecessary null check in the rule's if clause
   }
   for (String label in requireSemanticsLabel) {
+    if (constructorName == label) return true;
+  }
+  return false;
+}
+
+///
+/// checks if the [constructorName] requires a semantic widget property
+///
+bool requiresSemanticWidget(String? constructorName) {
+  if (constructorName == null) {
+    return false; // to avoid unnecessary null check in the rule's if clause
+  }
+  for (String label in requireSemanticWidget) {
     if (constructorName == label) return true;
   }
   return false;

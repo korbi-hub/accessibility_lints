@@ -14,7 +14,8 @@ To use the package in your Flutter project, import it as a dependency in your ``
 ```yaml
   custom_lint: [latest version]
   accessibility_lints:
-    url: git@github.com:korbi-hub/accessibility_lints.git
+    git:
+      url: https://github.com/korbi-hub/accessibility_lints.git
 ```
 
 Additionally you have to activate the [custom_lint](https://pub.dev/packages/custom_lint) package in your ```analysis_options.yaml``` file.

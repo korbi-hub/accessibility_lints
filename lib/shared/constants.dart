@@ -60,5 +60,9 @@
     'AlertDialog',
   ];
 
+  const requireSemanticWidget = [
+    'GestureDetector',
+  ];
+
   // package name
   const packageName = 'accessibility_lints';

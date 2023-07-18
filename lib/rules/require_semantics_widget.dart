@@ -22,6 +22,8 @@ class RequireSemanticsWidget extends DartLintRule {
             (requiresSemanticLabel(
                     node.constructorName.staticElement!.displayName) ||
                 requiresSemanticsLabel(
+                    node.constructorName.staticElement!.displayName) ||
+                requiresSemanticWidget(
                     node.constructorName.staticElement!.displayName)) &&
             !parentIsSemantic(node.parent, node)) {
           reporter.reportErrorForNode(_code, node);
@@ -45,19 +47,18 @@ class RequireSemanticsWidget extends DartLintRule {
 class RequireSemanticsWidgetFix extends DartFix {
   @override
   void run(
-      CustomLintResolver resolver,
-      ChangeReporter reporter,
-      CustomLintContext context,
-      AnalysisError analysisError,
-      List<AnalysisError> others,
-      ) {
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
     context.registry.addInstanceCreationExpression((node) {
       if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
       if (node.constructorName.staticElement?.displayName != null) {
         if (!containsSemanticLabel(node) &&
             (requiresSemanticLabel(
-                node.constructorName.staticElement!.displayName) ||
+                    node.constructorName.staticElement!.displayName) ||
                 requiresSemanticsLabel(
                     node.constructorName.staticElement!.displayName)) &&
             !parentIsSemantic(node.parent, node)) {
