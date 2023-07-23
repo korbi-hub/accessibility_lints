@@ -25,7 +25,7 @@ class RequireSemanticsLabel extends DartLintRule {
       if (!containsSemanticLabel(node) &&
           (requiresSemanticsLabel(
                   node.constructorName.staticElement!.displayName) ||
-              requiresSemanticsLabel(
+              requiresSemanticLabel(
                   node.constructorName.staticElement!.displayName)) &&
           !parentIsSemantic(node.parent, node)) {
         reporter.reportErrorForNode(_code, node);
@@ -55,7 +55,7 @@ class RequireSemanticsLabelFix extends DartFix {
       if (!containsSemanticLabel(node) &&
           (requiresSemanticsLabel(
                   node.constructorName.staticElement!.displayName) ||
-              requiresSemanticsLabel(
+              requiresSemanticLabel(
                   node.constructorName.staticElement!.displayName)) &&
           !parentIsSemantic(node.parent, node)) {
         final String parameter;
