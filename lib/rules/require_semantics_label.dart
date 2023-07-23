@@ -23,8 +23,10 @@ class RequireSemanticsLabel extends DartLintRule {
     context.registry.addInstanceCreationExpression((node) {
       // check if the widget requires the desired property
       if (!containsSemanticLabel(node) &&
-          requiresSemanticsLabel(
-              node.constructorName.staticElement!.displayName) &&
+          (requiresSemanticsLabel(
+                  node.constructorName.staticElement!.displayName) ||
+              requiresSemanticsLabel(
+                  node.constructorName.staticElement!.displayName)) &&
           !parentIsSemantic(node.parent, node)) {
         reporter.reportErrorForNode(_code, node);
       }
@@ -40,25 +42,33 @@ class RequireSemanticsLabel extends DartLintRule {
 class RequireSemanticsLabelFix extends DartFix {
   @override
   void run(
-      CustomLintResolver resolver,
-      ChangeReporter reporter,
-      CustomLintContext context,
-      AnalysisError analysisError,
-      List<AnalysisError> others,
-      ) {
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
     context.registry.addInstanceCreationExpression((node) {
       if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
 
       // check if the widget requires the desired property
       if (!containsSemanticLabel(node) &&
-          requiresSemanticsLabel(
-              node.constructorName.staticElement!.displayName) &&
+          (requiresSemanticsLabel(
+                  node.constructorName.staticElement!.displayName) ||
+              requiresSemanticsLabel(
+                  node.constructorName.staticElement!.displayName)) &&
           !parentIsSemantic(node.parent, node)) {
+        final String parameter;
+        if (requiresSemanticsLabel(
+            node.constructorName.staticElement!.displayName)) {
+          parameter = semanticsLabelFix;
+        } else {
+          parameter = semanticLabelFix;
+        }
         applyParameter(
           correctionMessage: semanticsLabelCorrection,
           parameter: addRemainingParameter(
-              newParameter: semanticsLabelFix,
-              arguments: node.argumentList.arguments),
+              newParameter: parameter, arguments: node.argumentList.arguments),
           selectedNode: node,
           changeReporter: reporter,
         );
