@@ -4,11 +4,23 @@ import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+/// constants
+const semanticsLabelFix = 'semanticsLabel: semanticsLabelText';
+const semanticLabelFix = 'semanticLabel: semanticLabelText';
+const semanticsLabelFlag = 'semanticsLabel';
+const semanticsLabelName = 'require_semantics_label';
+const semanticsLabelMsg =
+    'This Widget requires a semantic label to improve the overall accessibility of this application.\n\n'
+    '''A semantic label provides a full sentence to describe a widget's content.''';
+const semanticsLabelCorrection = 'add a semantic label';
+const semanticLabelFlag = 'semanticLabel';
+const semanticLabelName = 'require_semantic_label';
+
 class RequireSemanticsLabel extends DartLintRule {
-  RequireSemanticsLabel() : super(code: _code);
+  RequireSemanticsLabel() : super(code: _lintCode);
 
   // define an error code consisting of an error name, a problem message and a correction message
-  static const _code = LintCode(
+  static const _lintCode = LintCode(
     name: semanticsLabelName,
     problemMessage: semanticsLabelMsg,
     correctionMessage: semanticsLabelCorrection,
@@ -28,7 +40,7 @@ class RequireSemanticsLabel extends DartLintRule {
               requiresSemanticLabel(
                   node.constructorName.staticElement!.displayName)) &&
           !parentIsSemantic(node.parent, node)) {
-        reporter.reportErrorForNode(_code, node);
+        reporter.reportErrorForNode(_lintCode, node);
       }
     });
   }

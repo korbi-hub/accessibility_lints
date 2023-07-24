@@ -1,3 +1,5 @@
+import 'package:accessibility_lints/rules/require_semantics_label.dart';
+import 'package:accessibility_lints/rules/require_semantics_widget.dart';
 import 'package:accessibility_lints/shared/constants.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/source_range.dart';
@@ -75,6 +77,10 @@ void insertSemanticsWidget(
   });
 }
 
+bool isTextWidget(String? text) {
+  return text != null && text == 'Text';
+}
+
 bool needsFix(InstanceCreationExpression node, String parameter) {
   for (var v in node.argumentList.arguments) {
     if (v.toString().contains(RegExp(parameter))) {
@@ -149,25 +155,33 @@ bool requiresSemanticsLabel(String? constructorName) {
 /// checks if the [constructorName] requires a semantic widget property
 ///
 bool requiresSemanticWidget(String? constructorName) {
-  if (constructorName == null) {
-    return false; // to avoid unnecessary null check in the rule's if clause
+  if (constructorName != null) {
+    for (String label in requireSemanticWidget) {
+      if (constructorName == label) return true;
+    }
   }
-  for (String label in requireSemanticWidget) {
-    if (constructorName == label) return true;
-  }
-  return false;
+  return false; // to avoid unnecessary null check in the rule's if clause
 }
 
 ///
 /// checks wether the [parentNode] of a node is a Semantics widget
 ///
-bool parentIsSemantic(AstNode? parentNode, InstanceCreationExpression node) {
-  if (parentNode == null || parentNode.parent == null) return false;
-  String parentContent = parentNode.parent.toString();
+bool parentIsSemantic(
+    AstNode? parentNode, InstanceCreationExpression node) {
+  // ensure null safety
+  if (parentNode == null || parentNode.parent?.parent == null) return false;
+  String parentContent = parentNode.parent!.parent.toString();
+  // return false if the child property is not contained within the parent node
+  if (!parentContent.contains('child')) return false;
   if (!parentContent.contains('[')) {
-    return parentNode.parent
-        .toString()
-        .contains(RegExp(r'SemanticsProperties'));
+    if (!parentContent.contains('child:')) {
+      return false;
+    } else {
+      // only check the first child
+      return parentContent
+          .split('child')[0]
+          .contains('Semantics.fromProperties(');
+    }
   }
   // structures like e.g. Columns need to be parsed differently
   else {
@@ -175,9 +189,14 @@ bool parentIsSemantic(AstNode? parentNode, InstanceCreationExpression node) {
     if (parentContent.contains('[')) {
       return false;
     } else {
-      parentContent =
-          parentContent.split(node.constructorName.staticElement!.name).last;
-      return parentContent.contains(RegExp(r'SemanticsProperties'));
+      if (!parentContent.contains('child:')) {
+        return false;
+      } else {
+        // only check the first child
+        return parentContent
+            .split('child')[0]
+            .contains('Semantics.fromProperties(');
+      }
     }
   }
 }

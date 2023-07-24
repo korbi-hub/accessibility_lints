@@ -1,13 +1,21 @@
-import 'package:accessibility_lints/shared/constants.dart';
 import 'package:accessibility_lints/shared/utility_methods.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
-class RequireSemanticsWidget extends DartLintRule {
-  RequireSemanticsWidget() : super(code: _code);
+/// constants
+const semanticsWidgetFlag = 'Semantics';
+const semanticsWidgetName = 'require_semantics_widget';
+const semanticsWidgetMsg = '''This Widget requires to be wrapped inside a Semantics widget to enable visually impaired people to access the application's content''';
+const semanticsWidgetCorrection = 'wrap widget inside a Semantics widget';
 
-  static const _code = LintCode(
+// default value for the SemanticsProperties parameter in a Semantics widget
+const defaultSemanticsProperties = 'SemanticsProperties(enabled: true, attributedLabel: AttributedString(string),)';
+
+class RequireSemanticsWidget extends DartLintRule {
+  RequireSemanticsWidget() : super(code: _lintCode);
+
+  static const _lintCode = LintCode(
     name: semanticsWidgetName,
     problemMessage: semanticsWidgetMsg,
     correctionMessage: semanticsWidgetCorrection,
@@ -17,16 +25,17 @@ class RequireSemanticsWidget extends DartLintRule {
   void run(CustomLintResolver resolver, ErrorReporter reporter,
       CustomLintContext context) {
     context.registry.addInstanceCreationExpression((node) {
-      if (node.constructorName.staticElement?.displayName != null) {
+      String? widgetName = node.constructorName.staticElement?.displayName;
+      if (widgetName != null) {
         if (!containsSemanticLabel(node) &&
             (requiresSemanticLabel(
-                    node.constructorName.staticElement!.displayName) ||
+                    widgetName) ||
                 requiresSemanticsLabel(
-                    node.constructorName.staticElement!.displayName) ||
+                    widgetName) ||
                 requiresSemanticWidget(
-                    node.constructorName.staticElement!.displayName)) &&
+                    widgetName)) &&
             !parentIsSemantic(node.parent, node)) {
-          reporter.reportErrorForNode(_code, node);
+          reporter.reportErrorForNode(_lintCode, node);
         }
       }
     });
@@ -55,12 +64,15 @@ class RequireSemanticsWidgetFix extends DartFix {
   ) {
     context.registry.addInstanceCreationExpression((node) {
       if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-      if (node.constructorName.staticElement?.displayName != null) {
+      String? widgetName = node.constructorName.staticElement?.displayName;
+      if (widgetName != null) {
         if (!containsSemanticLabel(node) &&
             (requiresSemanticLabel(
-                    node.constructorName.staticElement!.displayName) ||
+                widgetName) ||
                 requiresSemanticsLabel(
-                    node.constructorName.staticElement!.displayName)) &&
+                    widgetName) ||
+                requiresSemanticWidget(
+                    widgetName)) &&
             !parentIsSemantic(node.parent, node)) {
           final String semanticsWidget = wrapInSemanticsWidget(widget: node);
           insertSemanticsWidget(
